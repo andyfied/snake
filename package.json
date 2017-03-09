@@ -1,0 +1,32 @@
+{
+  "name": "b-snake",
+  "version": "1.0.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "scripts": {
+    "blazar": "blazar-core",
+    "start": "blazar-core start",
+    "build": "blazar-core build",
+    "check": "blazar-core check"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "blazar"
+  ],
+  "author": "Andreas �hlund",
+  "homepage": "",
+  "dependencies": {
+    "blazar-core": "^1.2.5"
+  },
+  "devDependencies": {
+    "eslint": "^3.7.1",
+    "eslint-config-airbnb": "^12.0.0",
+    "eslint-plugin-import": "^1.16.0",
+    "eslint-plugin-jsx-a11y": "^2.2.2",
+    "eslint-plugin-react": "^6.3.0"
+}
+}
