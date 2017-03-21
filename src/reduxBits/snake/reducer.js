@@ -5,7 +5,8 @@ import * as actions from './actions'
 const initialState = Immutable.from({
   speed: 100,
   direction: 'right',
-  size: 10,
+  size: 20,
+  boardSize: [400, 400],
   position: [
     [6, 4], [5, 4], [4, 4],
   ],
@@ -22,11 +23,13 @@ const snake = (state = initialState, { type, payload, error }) => {
     case actions.SET_SIZE:
       return state.set('size', payload)
     case actions.SET_POSITION:
-      return state.set('postion', payload)
+      return state.set('position', payload)
     case actions.SET_GAME_OVER:
       return state.set('gameOver', payload)
     case actions.SET_FOOD_POSITION:
       return state.set('foodPosition', payload)
+    case actions.SET_BOARD_SIZE:
+      return state.set('boardSize', payload)
     default:
       return state
   }

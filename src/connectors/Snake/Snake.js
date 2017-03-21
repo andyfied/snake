@@ -3,6 +3,12 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import { actionCreators } from 'reduxBits/snake'
+import _ from 'lodash';
+
+const LEFT = 'left'
+const RIGHT = 'right'
+const UP = 'up'
+const DOWN = 'down'
 
 const mapStateToProps = state => ({
   speed: state.snake.speed,
@@ -10,7 +16,8 @@ const mapStateToProps = state => ({
   size: state.snake.size,
   position: state.snake.position,
   gameOver: state.snake.gameOver,
-  applePosition: state.snake.applePosition,
+  foodPosition: state.snake.foodPosition,
+  boardSize: state.snake.boardSize,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -28,24 +35,76 @@ export class _Snake extends React.Component {
     clearInterval(this.interval)
   }
 
-  init = () => {
-    const {
-      actions,
-      speed,
-    } = this.props
-    // TODO set focus
-    actions.setFoodPosition(this.generateApplePosition())
-
-    this.interval = setInterval(this.gameLoop, speed)
-  }
-
-  generateApplePosition = () => {
+  getNewPosition = (direction, lastPosition) => {
     const {
       size,
+      boardSize,
+    } = this.props
+    const surfaceWidth = parseInt(boardSize[0] / size, 10);
+    const surfaceHeight = parseInt(boardSize[1] / size, 10);
+
+    switch (direction) {
+      case LEFT:
+        if (lastPosition[0] - 1 === -1) {
+          return ([surfaceWidth, lastPosition[1]])
+        }
+        return ([lastPosition[0] - 1, lastPosition[1]])
+      case UP:
+        if (lastPosition[1] - 1 === -1) {
+          return ([lastPosition[0], surfaceHeight])
+        }
+        return ([lastPosition[0], lastPosition[1] - 1])
+      case RIGHT:
+        if (lastPosition[0] + 1 > surfaceWidth) {
+          return ([0, lastPosition[1]])
+        }
+        return ([lastPosition[0] + 1, lastPosition[1]])
+      case DOWN:
+        if (lastPosition[1] + 1 > surfaceHeight) {
+          return ([lastPosition[0], 0])
+        }
+        return ([lastPosition[0], lastPosition[1] + 1])
+      default:
+        return (lastPosition)
+    }
+  }
+
+  handleKeyDown = (event) => {
+    console.log('handle key!!')
+    const {
+      direction,
+      actions,
     } = this.props
 
-    const surfaceWidth = parseInt(window.innerWidth / size, 10);
-    const surfaceHeight = parseInt(window.innerHeight / size, 10);
+    const keys = {
+      37: LEFT,
+      38: UP,
+      39: RIGHT,
+      40: DOWN,
+    }
+
+    const newDirection = keys[event.which]
+    if (newDirection) {
+      if ((direction === LEFT && newDirection === RIGHT) ||
+          (direction === UP && newDirection === DOWN) ||
+          (direction === RIGHT && newDirection === LEFT) ||
+          (direction === DOWN && newDirection === UP)) {
+        return
+      }
+      actions.setDirection(newDirection)
+    }
+
+    event.preventDefault()
+  }
+
+  generateFoodPosition = () => {
+    const {
+      size,
+      boardSize,
+    } = this.props
+
+    const surfaceWidth = parseInt(boardSize[0] / size, 10);
+    const surfaceHeight = parseInt(boardSize[1] / size, 10);
 
     return ([
       Math.floor(Math.random() * surfaceWidth),
@@ -54,45 +113,130 @@ export class _Snake extends React.Component {
   }
 
   advance = () => {
-    console.log('advance')
+    const {
+      direction,
+      position,
+      foodPosition,
+      actions,
+    } = this.props
+
+    const currentPosition = position[0]
+    const pos = position.slice(0, position.length - 1);
+    const newPosition = this.getNewPosition(direction, currentPosition)
+
+    if (_.isEqual(currentPosition, foodPosition)) {
+      actions.setFoodPosition(this.generateFoodPosition())
+      actions.setPosition([newPosition, ...position])
+    } else {
+      position.forEach((element) => {
+        if (_.isEqual(newPosition, element)) {
+          actions.setGameOver(true)
+        }
+      })
+      actions.setPosition([newPosition, ...pos])
+    }
+  }
+
+  drawElement = (position) => {
+    const {
+      size,
+    } = this.props
+
+    const x = size * position[0]
+    const y = size * position[1]
+    this._context.fillRect(x, y, size, size)
   }
 
   drawSnake = () => {
-    console.log('draw snake')
+    const {
+      position,
+    } = this.props
+
+    this._context.save()
+    this._context.fillStyle = '#00bb70'
+
+    position.forEach(this.drawElement)
+
+    this._context.restore()
   }
 
-  drawApple = () => {
-    console.log('draw apple')
+  drawFood = () => {
+    // TODO: don't draw food on snake body
+    const {
+      size,
+      foodPosition,
+    } = this.props
+
+    this._context.save()
+    this._context.fillStyle = '#ef404f'
+    this._context.beginPath()
+    const radius = size / 2;
+
+    let x = foodPosition[0] * size
+    x += radius
+
+    let y = foodPosition[1] * size
+    y += radius
+
+    this._context.arc(x, y, radius, 0, Math.PI * 2, true)
+    this._context.fill()
+    this._context.restore()
   }
 
   gameLoop = () => {
     const {
       gameOver,
+      boardSize,
     } = this.props
-    const canvasWidth = parseInt(window.innerWidth, 10)
-    const canvasHeight = parseInt(window.innerHeight, 10)
+    const canvasWidth = boardSize[0]
+    const canvasHeight = boardSize[1]
 
     // TODO get width from canvas?
     this._context.clearRect(0, 0, canvasWidth, canvasHeight)
     this.advance()
     this.drawSnake()
-    this.drawApple()
+    this.drawFood()
 
     if (gameOver) {
       clearInterval(this.interval)
     }
   }
 
+  focusInput = () => {
+    this.input.focus()
+  }
+
+  init = () => {
+    const {
+      actions,
+      speed,
+    } = this.props
+    this.focusInput()
+    actions.setFoodPosition(this.generateFoodPosition())
+
+    this.interval = setInterval(this.gameLoop, speed)
+  }
+
   render() {
+    const {
+      boardSize,
+    } = this.props
     return (
       <div>
+        <input
+          style={{ position: 'absolute', width: 0, height: 0, outline: '0 !important', border: 'none' }}
+          ref={(inpt) => { this.input = inpt }}
+          type="text"
+          onKeyDown={this.handleKeyDown}
+        />
         <h1>
           b-snake
         </h1>
         <canvas
           ref={(c) => { this.canvas = c }}
-          width={window.innerWidth}
-          height={window.innerWidth}
+          onKeyDown={this.handleKeyDown}
+          width={boardSize[0]}
+          height={boardSize[1]}
         />
       </div>
     )
@@ -104,6 +248,11 @@ _Snake.propTypes = {
   size: React.PropTypes.number,
   speed: React.PropTypes.number,
   gameOver: React.PropTypes.bool,
+  direction: React.PropTypes.string,
+  position: React.PropTypes.array,
+  foodPosition: React.PropTypes.array,
+  boardSize: React.PropTypes.array,
+  
 }
 
 export default connect(

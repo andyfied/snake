@@ -20,7 +20,8 @@
   "author": "Andreas �hlund",
   "homepage": "",
   "dependencies": {
-    "blazar-core": "^1.2.5"
+    "blazar-core": "^1.2.5",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "eslint": "^3.7.1",
@@ -28,5 +29,5 @@
     "eslint-plugin-import": "^1.16.0",
     "eslint-plugin-jsx-a11y": "^2.2.2",
     "eslint-plugin-react": "^6.3.0"
-}
+  }
 }

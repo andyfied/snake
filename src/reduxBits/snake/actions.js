@@ -6,6 +6,7 @@ export const SET_SIZE = 'Set size of canvas'
 export const SET_POSITION = 'Set snake position'
 export const SET_GAME_OVER = 'Game over'
 export const SET_FOOD_POSITION = 'Set the position of the food'
+export const SET_BOARD_SIZE = 'Set the size of the board'
 
 const setSpeed = createAction(
   SET_SPEED,
@@ -37,6 +38,11 @@ const setFoodPosition = createAction(
   (payload) => payload
 )
 
+const setBoardSize = createAction(
+  SET_BOARD_SIZE,
+  (payload) => payload
+)
+
 export const actionCreators = {
   setSpeed,
   setDirection,
@@ -44,4 +50,5 @@ export const actionCreators = {
   setPosition,
   setGameOver,
   setFoodPosition,
+  setBoardSize,
 }
