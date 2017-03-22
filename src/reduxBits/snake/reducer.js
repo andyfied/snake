@@ -30,6 +30,8 @@ const snake = (state = initialState, { type, payload, error }) => {
       return state.set('foodPosition', payload)
     case actions.SET_BOARD_SIZE:
       return state.set('boardSize', payload)
+    case actions.RESET:
+      return initialState
     default:
       return state
   }

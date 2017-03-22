@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import Immutable from 'seamless-immutable'
 
 import { actionCreators } from 'reduxBits/snake'
 import _ from 'lodash';
@@ -9,6 +10,43 @@ const LEFT = 'left'
 const RIGHT = 'right'
 const UP = 'up'
 const DOWN = 'down'
+
+const styles = Immutable.from({
+  wrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  canvas: {
+    border: '1px solid #5e5d5c',
+    backgroundColor: '#f9f7f6',
+  },
+  gameOver: {
+    position: 'absolute',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  button: {
+    backgroundColor: '#49b975',
+    borderRadius: '4px',
+    padding: '10px',
+    color: 'white',
+    cursor: 'pointer',
+  },
+
+  gameOverHeader: {
+    fontFamily: '\'BlocketSans-Bold\', sans-serif',
+    color: '#ef404f',
+  },
+  score: {
+    marginTop: '0',
+    color: '#5E5D5C',
+  },
+})
 
 const mapStateToProps = state => ({
   speed: state.snake.speed,
@@ -70,7 +108,6 @@ export class _Snake extends React.Component {
   }
 
   handleKeyDown = (event) => {
-    console.log('handle key!!')
     const {
       direction,
       actions,
@@ -153,7 +190,7 @@ export class _Snake extends React.Component {
     } = this.props
 
     this._context.save()
-    this._context.fillStyle = '#00bb70'
+    this._context.fillStyle = '#4182C3'
 
     position.forEach(this.drawElement)
 
@@ -167,19 +204,16 @@ export class _Snake extends React.Component {
       foodPosition,
     } = this.props
 
+    const food = new Image(size, size)
+    food.src = 'assets/symbol.svg'
+
     this._context.save()
-    this._context.fillStyle = '#ef404f'
-    this._context.beginPath()
-    const radius = size / 2;
 
-    let x = foodPosition[0] * size
-    x += radius
+    const x = foodPosition[0] * size
+    const y = foodPosition[1] * size
 
-    let y = foodPosition[1] * size
-    y += radius
+    this._context.drawImage(food, x, y, size, size)
 
-    this._context.arc(x, y, radius, 0, Math.PI * 2, true)
-    this._context.fill()
     this._context.restore()
   }
 
@@ -202,6 +236,15 @@ export class _Snake extends React.Component {
     }
   }
 
+  resetGame = () => {
+    const {
+      actions,
+    } = this.props
+
+    actions.resetGame()
+    this.init()
+  }
+
   focusInput = () => {
     this.input.focus()
   }
@@ -220,6 +263,8 @@ export class _Snake extends React.Component {
   render() {
     const {
       boardSize,
+      gameOver,
+      position,
     } = this.props
     return (
       <div>
@@ -232,12 +277,31 @@ export class _Snake extends React.Component {
         <h1>
           b-snake
         </h1>
-        <canvas
-          ref={(c) => { this.canvas = c }}
-          onKeyDown={this.handleKeyDown}
-          width={boardSize[0]}
-          height={boardSize[1]}
-        />
+        <div style={_.merge(styles.wrapper, { width: `${boardSize[0]}px`, height: `${boardSize[1]}px` })}>
+          {gameOver &&
+            <div style={styles.gameOver}>
+              <h1 style={styles.gameOverHeader}>
+                Game over!
+              </h1>
+              <h2 style={styles.score}>
+                Score: {position.length}
+              </h2>
+              <div
+                style={styles.button}
+                onClick={this.resetGame}
+              >
+                Give it another go
+              </div>
+            </div>
+          }
+          <canvas
+            style={styles.canvas}
+            ref={(c) => { this.canvas = c }}
+            onKeyDown={this.handleKeyDown}
+            width={boardSize[0]}
+            height={boardSize[1]}
+          />
+        </div>
       </div>
     )
   }
@@ -252,7 +316,6 @@ _Snake.propTypes = {
   position: React.PropTypes.array,
   foodPosition: React.PropTypes.array,
   boardSize: React.PropTypes.array,
-  
 }
 
 export default connect(
