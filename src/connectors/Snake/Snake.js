@@ -18,6 +18,20 @@ const styles = Immutable.from({
     alignItems: 'center',
   },
 
+  header: {
+    fontFamily: '\'BlocketSans-Bold\', sans-serif',
+    color: '#EF404F',
+    fontSize: '45px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  logo: {
+    marginRight: '10px',
+    height: '55px',
+  },
+
   canvas: {
     border: '1px solid #5e5d5c',
     backgroundColor: '#f9f7f6',
@@ -190,7 +204,7 @@ export class _Snake extends React.Component {
     } = this.props
 
     this._context.save()
-    this._context.fillStyle = '#4182C3'
+    this._context.fillStyle = '#49B975'
 
     position.forEach(this.drawElement)
 
@@ -274,8 +288,13 @@ export class _Snake extends React.Component {
           type="text"
           onKeyDown={this.handleKeyDown}
         />
-        <h1>
-          b-snake
+        <h1 style={styles.header}>
+          <img
+            style={styles.logo}
+            src="assets/symbol.svg"
+            alt="Blocket logo"
+          />
+          snake
         </h1>
         <div style={_.merge(styles.wrapper, { width: `${boardSize[0]}px`, height: `${boardSize[1]}px` })}>
           {gameOver &&
