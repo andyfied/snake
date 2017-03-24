@@ -6,7 +6,7 @@ const initialState = Immutable.from({
   speed: 100,
   direction: 'right',
   size: 40,
-  boardSize: [800, 800],
+  boardSize: [600, 400],
   position: [
     [6, 4], [5, 4], [4, 4],
   ],
