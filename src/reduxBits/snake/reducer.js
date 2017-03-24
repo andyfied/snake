@@ -5,8 +5,8 @@ import * as actions from './actions'
 const initialState = Immutable.from({
   speed: 100,
   direction: 'right',
-  size: 20,
-  boardSize: [400, 400],
+  size: 40,
+  boardSize: [800, 800],
   position: [
     [6, 4], [5, 4], [4, 4],
   ],

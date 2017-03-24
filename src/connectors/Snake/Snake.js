@@ -42,6 +42,7 @@ const styles = Immutable.from({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: '100',
   },
 
   button: {
@@ -218,15 +219,12 @@ export class _Snake extends React.Component {
       foodPosition,
     } = this.props
 
-    const food = new Image(size, size)
-    food.src = 'assets/symbol.svg'
-
     this._context.save()
 
     const x = foodPosition[0] * size
     const y = foodPosition[1] * size
 
-    this._context.drawImage(food, x, y, size, size)
+    this._context.drawImage(this._food, x, y, size, size)
 
     this._context.restore()
   }
@@ -267,7 +265,12 @@ export class _Snake extends React.Component {
     const {
       actions,
       speed,
+      size,
     } = this.props
+
+    this._food = new Image(size, size)
+    this._food.src = 'assets/symbol.svg'
+
     this.focusInput()
     actions.setFoodPosition(this.generateFoodPosition())
 
@@ -296,7 +299,7 @@ export class _Snake extends React.Component {
           />
           snake
         </h1>
-        <div style={_.merge(styles.wrapper, { width: `${boardSize[0]}px`, height: `${boardSize[1]}px` })}>
+        <div style={styles.wrapper}>
           {gameOver &&
             <div style={styles.gameOver}>
               <h1 style={styles.gameOverHeader}>
@@ -314,9 +317,15 @@ export class _Snake extends React.Component {
             </div>
           }
           <canvas
-            style={styles.canvas}
+            style={
+              gameOver ?
+              _.merge({}, styles.canvas, { opacity: '0.3' })
+              :
+              styles.canvas
+            }
             ref={(c) => { this.canvas = c }}
             onKeyDown={this.handleKeyDown}
+            onClick={ this.focusInput }
             width={boardSize[0]}
             height={boardSize[1]}
           />
