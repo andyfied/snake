@@ -1,12 +1,13 @@
 import Immutable from 'seamless-immutable'
 
 import * as actions from './actions'
+import { size, boardSize } from '../../../config'
 
 const initialState = Immutable.from({
   speed: 100,
   direction: 'right',
-  size: 40,
-  boardSize: [600, 400],
+  size: size,
+  boardSize: boardSize,
   position: [
     [6, 4], [5, 4], [4, 4],
   ],
